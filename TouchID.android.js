@@ -4,6 +4,7 @@ import { getError, TouchIDError, TouchIDUnifiedError } from './errors';
 const NativeTouchID = NativeModules.FingerprintAuth;
 
 export default {
+  isEnrolledAsync: NativeTouchID.isEnrolledAsync,
   isSupported(config) {
     return new Promise((resolve, reject) => {
       NativeTouchID.isSupported(

@@ -9,10 +9,15 @@ import android.os.Build;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+
+import java.util.UUID;
 
 import javax.crypto.Cipher;
 
@@ -22,13 +27,14 @@ public class FingerprintAuthModule extends ReactContextBaseJavaModule implements
 
     private KeyguardManager keyguardManager;
     private boolean isAppActive;
-
+    private FingerprintCipher fingerprintCipher;
     public static boolean inProgress = false;
 
     public FingerprintAuthModule(final ReactApplicationContext reactContext) {
         super(reactContext);
 
         reactContext.addLifecycleEventListener(this);
+        fingerprintCipher = new FingerprintCipher();
     }
 
     private KeyguardManager getKeyguardManager() {
@@ -59,10 +65,7 @@ public class FingerprintAuthModule extends ReactContextBaseJavaModule implements
 
         int result = isFingerprintAuthAvailable();
         if (result == FingerprintAuthConstants.IS_SUPPORTED) {
-            // TODO: once this package supports Android's Face Unlock,
-            // implement a method to find out which type of biometry
-            // (not just fingerprint) is actually supported
-            reactSuccessCallback.invoke("Fingerprint");
+            reactSuccessCallback.invoke("Is supported.");
         } else {
             reactErrorCallback.invoke("Not supported.", result);
         }
@@ -85,7 +88,7 @@ public class FingerprintAuthModule extends ReactContextBaseJavaModule implements
         }
 
         /* FINGERPRINT ACTIVITY RELATED STUFF */
-        final Cipher cipher = new FingerprintCipher().getCipher();
+        final Cipher cipher = fingerprintCipher.getCipher();
         if (cipher == null) {
             inProgress = false;
             reactErrorCallback.invoke("Not supported", FingerprintAuthConstants.NOT_AVAILABLE);
@@ -142,6 +145,34 @@ public class FingerprintAuthModule extends ReactContextBaseJavaModule implements
             return FingerprintAuthConstants.NOT_ENROLLED;
         }
         return FingerprintAuthConstants.IS_SUPPORTED;
+    }
+
+    @ReactMethod
+    public void isEnrolledAsync(final Promise promise) {
+        final WritableMap writableMap = new WritableNativeMap();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    boolean isEnrolled = isFingerprintAuthAvailable() == FingerprintAuthConstants.IS_SUPPORTED;
+                    writableMap.putBoolean("isEnrolled",isEnrolled );
+                    try{
+                        Cipher cipher  = fingerprintCipher.getCipher();
+                        writableMap.putString("token",fingerprintCipher.getToken());
+                        promise.resolve(writableMap);
+                    }  catch (Exception ex) {
+                        ex.printStackTrace();
+                        writableMap.putBoolean("isEnrolled",false);
+                        writableMap.putString("token", UUID.randomUUID().toString());
+                        promise.resolve(writableMap);
+                    }
+                }
+            }).start();
+        } else {
+            writableMap.putBoolean("isEnrolled",false);
+            writableMap.putString("token", UUID.randomUUID().toString());
+            promise.resolve(writableMap);
+        }
     }
 
     @Override

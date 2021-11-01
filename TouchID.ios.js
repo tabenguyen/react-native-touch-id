@@ -14,6 +14,7 @@ const { getError, TouchIDError, TouchIDUnifiedError } = require('./errors');
  */
 
 export default {
+  isEnrolledAsync: NativeTouchID.isEnrolledAsync,
   isSupported(config) {
     return new Promise((resolve, reject) => {
       NativeTouchID.isSupported(config, (error, biometryType) => {

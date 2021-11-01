@@ -3,12 +3,15 @@ package com.rnfingerprint;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,7 +56,7 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fingerprint_dialog, container, false);
 
-        final TextView mFingerprintDescription = (TextView) v.findViewById(R.id.fingerprint_description);
+        final TextView mFingerprintDescription = (TextView) v.findViewById(R.id.biometricDescription);
         mFingerprintDescription.setText(this.authReason);
 
         this.mFingerprintImage = (ImageView) v.findViewById(R.id.fingerprint_icon);
@@ -76,7 +79,8 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
             }
         });
 
-        getDialog().setTitle(this.dialogTitle);
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                 if (keyCode != KeyEvent.KEYCODE_BACK || mFingerprintHandler == null) {
