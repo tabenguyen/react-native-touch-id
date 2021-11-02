@@ -67,6 +67,7 @@
                 android:layout_below="@+id/biometricTitle"
                 android:gravity="center"
                 android:textSize="14sp"
+                android:textColor="#919191"
                 android:text="Sửa dụng dấu vân tay của bạn để xác nhận đăng nhập" />
 
             <TextView
@@ -86,6 +87,8 @@
                 android:background="@drawable/ic_cancel_background"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
+                android:text="Hủy bỏ"
+                android:textAllCaps="false"
                 android:textStyle="bold" />
         </LinearLayout>
 
