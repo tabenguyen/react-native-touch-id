@@ -60,9 +60,9 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
         mFingerprintDescription.setText(this.authReason);
 
         this.mFingerprintImage = (ImageView) v.findViewById(R.id.fingerprint_icon);
-        if (this.imageColor != 0) {
-            this.mFingerprintImage.setColorFilter(this.imageColor);
-        }
+        // if (this.imageColor != 0) {
+        //     this.mFingerprintImage.setColorFilter(this.imageColor);
+        // }
 
         this.mFingerprintSensorDescription = (TextView) v.findViewById(R.id.fingerprint_sensor_description);
         this.mFingerprintSensorDescription.setText(this.sensorDescription);
